@@ -1,0 +1,169 @@
+" git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+colorscheme desert                                                                 
+                                                                                                                                      
+if v:lang =~ "utf8$" || v:lang =~ "UTF-8$"                                      
+   set fileencodings=utf-8,gbk,ucs-bom,latin1                                   
+endif                                                                           
+                                                                                
+set nocompatible    " Use Vim defaults (much better!)                           
+set bs=indent,eol,start     " allow backspacing over everything in insert mode  
+set viminfo='20,\"50    " read/write a .viminfo file, don't store more          
+            " than 50 lines of registers                                        
+set history=50      " keep 50 lines of command line history                     
+set ruler       " show the cursor position all the time                         
+                                                                                
+" Only do this part when compiled with support for autocommands                 
+if has("autocmd")                                                               
+  augroup redhat                                                                
+  autocmd!                                                                      
+  " In text files, always limit the width of text to 78 characters              
+  autocmd BufRead *.txt set tw=78                                               
+  " When editing a file, always jump to the last cursor position                
+  autocmd BufReadPost *                                                         
+  \ if line("'\"") > 0 && line ("'\"") <= line("$") |                           
+  \   exe "normal! g'\"" |                                                      
+  \ endif                                                                       
+  " don't write swapfile on most commonly used directories for NFS mounts or USB sticks
+  autocmd BufNewFile,BufReadPre /media/*,/mnt/* set directory=~/tmp,/var/tmp,/tmp
+  " start with spec file template                                               
+  autocmd BufNewFile *.spec 0r /usr/share/vim/vimfiles/template.spec            
+  augroup END                                                                   
+endif                                                                           
+                                                                                
+if has("cscope") && filereadable("/usr/bin/cscope")                             
+   set csprg=/usr/bin/cscope                                                    
+   set csto=0                                                                   
+   set cst                                                                      
+   set nocsverb                                                                 
+   " add any database in current directory               
+   if filereadable("cscope.out")                                                
+      cs add cscope.out                                                         
+   " else add database pointed to by environment                                
+   elseif $CSCOPE_DB != ""                                                      
+      cs add $CSCOPE_DB                                                         
+   endif                                                                        
+   set csverb                                                                   
+endif                                                                           
+                                                                                
+" Switch syntax highlighting on, when the terminal has colors                   
+" Also switch on highlighting the last used search pattern.                     
+if &t_Co > 2 || has("gui_running")                                              
+  syntax on                                                                     
+  set hlsearch                                                                  
+endif                                                                           
+                                                                                
+if &term=="xterm"                                                               
+     set t_Co=8                                                                 
+     set t_Sb=^[[4%dm                                                           
+     set t_Sf=^[[3%dm                                                           
+endif                            
+
+filetype off                                                                    
+" set the runtime path to include Vundle and initialize                         
+set rtp+=~/.vim/bundle/Vundle.vim                                               
+call vundle#begin()                                                             
+Plugin 'gmarik/Vundle.vim'                                                      
+                                                                                
+"my Bundle here:                                                                
+"                                                                               
+" original repos on github                                                      
+Plugin 'kchmck/vim-coffee-script'                                               
+Plugin 'kien/ctrlp.vim'                                                         
+Plugin 'scrooloose/nerdtree'                                                    
+Plugin 'rking/ag.vim'                                                           
+Plugin 'w0rp/ale'                                                               
+Plugin 'tpope/vim-fugitive'                                                     
+Plugin 'vim-scripts/YankRing.vim'                                               
+Plugin 'hhatto/autopep8'                                                        
+Plugin 'tell-k/vim-autopep8'                                                    
+Plugin 'vim-scripts/mru.vim'                                                    
+Plugin 'sophacles/vim-bundle-mako'                                              
+Plugin 'Valloric/YouCompleteMe'                                                 
+Plugin 'elzr/vim-json'                                                          
+Plugin 'tpope/vim-surround'                                                     
+Plugin 'vim-airline/vim-airline'                                                
+Plugin 'tpope/vim-commentary'                                                   
+Plugin 'jiangmiao/auto-pairs'                                                   
+Plugin 'gko/vim-coloresque'                                                     
+Plugin 'fisadev/fisa-vim-colorscheme'                                           
+
+call vundle#end()                                                               
+syntax enable                                                                   
+filetype plugin indent on                                                       
+                                                                                
+let &termencoding=&encoding                                                     
+set cursorline                                                                  
+let &guicursor = &guicursor . ",a:blinkon0"                                     
+                                                                                
+au BufNewFile,BufRead *.mako set ft=mako                                        
+                                                                                
+set ts=4                                                                        
+set expandtab                                                                   
+set softtabstop=4                                                               
+set shiftwidth=4                                                                
+set autoindent                                                                  
+" set font family                                                               
+set guifont="Courier New"                                                       
+set number                                                                      
+set nobackup                                                                    
+set foldmethod=manual                                                           
+set foldlevel=99                                                                
+set colorcolumn=80                                                              
+hi ColorColumn ctermbg=234                                                      
+                                                                                
+" switch width                                                                  
+map <c-j> <c-w>j                                                                
+map <c-k> <c-w>k                                                                
+map <c-l> <c-w>l                                                                
+map <c-h> <c-w>h                 
+
+map <F2> :CtrlPClearCache<cr>                                                   
+map <F3> :NERDTree<CR>                                                          
+let g:NERDTreeDirArrows=0                                                       
+let NERDTreeIgnore = ['\.pyc$']                                                 
+map <F4> :Ag! <C-R><C-W><CR>                                                    
+map <F5> :w<cr>:!python %<cr>                                                   
+set pastetoggle=<F7>                                                            
+map <F9> :vertical res-1<CR>                                                    
+map <F10> :vertical res+1<CR>                                                   
+map <F11> :res-1<CR>                                                            
+map <F12> :res+1<CR>                                                            
+                                                                                
+map :ag :Ag!                                                                    
+map :yr :YRShow<CR>                                                             
+                                                                                
+vmap // y/<c-r>"<cr>                                                            
+vmap /// y:Ag! <c-r>"<cr>                                                       
+                                                                                
+set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.orig     " MacOSX/Linux        
+set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe,*.pyc  " Windows                    
+                                                                                
+" 加载 python 模板                                                              
+autocmd BufNewFile *.py  0r  ~/.vim/template/python/python.py                   
+
+filetype off                                                                    
+let &runtimepath.=',~/.vim/bundle/ale'                                          
+filetype plugin on                                                              
+let g:ale_sign_error = '•'                                                      
+let g:ale_sign_warning = '-'                                                    
+let g:ale_python_flake8_args="--ignore=E501"                                    
+" highlight clear ALEErrorSign                                                  
+" highlight clear ALEWarningSign                                                
+" highlight Pmenu ctermfg=0 ctermbg=7 guifg=#ffffff guibg=#0000ff               
+" highlight Pmenu ctermfg=2 ctermbg=0* guifg=#ffffff guibg=#0000ff              
+
+" youcompleteme 配置                                                            
+let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'                   
+"在接受补全后不分裂出一个窗口显示接受的项                                       
+set completeopt-=preview                                                        
+                                                                                
+" ctags 配置                                                                    
+set tags=tags;                                                                  
+set autochdir                                                                   
+                                                                                
+" autotag 配置                                                                  
+let g:autotagTagsFile=".tags"                                                   
+au BufWritePost *.py,*.coffee,*.js silent! !eval 'ctags -R -o newtags >/dev/null 2>&1; mv newtags tags' &
+                                                                                
+" vim-airline 配置                                                              
+set laststatus=2        
